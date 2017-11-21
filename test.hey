@@ -2,8 +2,18 @@ html
 
   head
     title
+      | Hey world !
 
   body
     div class='accent'
-    div
+      | Hello 
+      span
+        a href='#'
+          | Bobby
+      |  my friend
+    / div class='commented'
+      span
+        | Commented
+    footer
+      | Footer
 

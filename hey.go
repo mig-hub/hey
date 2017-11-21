@@ -20,9 +20,13 @@ func (nodes nodeSlice) last() *node {
 
 func closeNodes(nodes nodeSlice, level int) nodeSlice {
   for len(nodes)>0 {
-    last := nodes[len(nodes)-1]
+    last := nodes.last()
     if last.level<level { break }
-    fmt.Print("</", last.tag, ">");
+    if last.tag=="|" || last.tag=="/" {
+      // No closing
+    } else {
+      fmt.Print("</", last.tag, ">");
+    }
     nodes = nodes[:len(nodes)-1]
   }
   return nodes
@@ -40,29 +44,51 @@ func indentLevel(line string) int {
   return i
 }
 
+func extractTag(line string) string {
+  var tag string
+  i := strings.Index(line, " ")
+  if i>-1 {
+    tag = line[:i]
+  } else {
+    tag = line[:]
+  }
+  return tag
+}
+
+func isCommented(nodes nodeSlice, level int) bool {
+  if len(nodes)<1 { return false }
+  n := nodes.last()
+  return n.tag=="/" && level>n.level
+}
+
 func main() {
 
-  line := ""
-  level := 0
-  tag := ""
   nodes := make(nodeSlice, 0, 16)
 
 	fileScanner := bufio.NewScanner(os.Stdin)
 
 	for fileScanner.Scan() {
-    line = fileScanner.Text()
-		level = indentLevel(line)
+
+    line := fileScanner.Text()
+    level := indentLevel(line)
+
+    if isCommented(nodes, level) { continue }
+
     line = line[level:]
+
     if len(line)>0 {
-      i := strings.Index(line, " ")
-      if i>-1 {
-        tag = line[:i]
-      } else {
-        tag = line[:]
-      }
+      
+      tag := extractTag(line)
+
       nodes = closeNodes(nodes, level)
       nodes = append(nodes, &node{level,tag})
-      fmt.Print("<",line,">")
+      if tag=="|" {
+        fmt.Print(line[2:])
+      } else if tag=="/" {
+        // Comment
+      } else {
+        fmt.Print("<",line,">")
+      }
     }
 	}
 
