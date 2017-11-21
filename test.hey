@@ -4,6 +4,6 @@ html
     title
 
   body
-    div
+    div class='accent'
     div
 

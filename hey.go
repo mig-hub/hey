@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"bufio"
 	"os"
+  "strings"
 )
 
 type node struct {
@@ -51,11 +52,17 @@ func main() {
 	for fileScanner.Scan() {
     line = fileScanner.Text()
 		level = indentLevel(line)
-    tag = line[level:]
-    if len(tag)>0 {
+    line = line[level:]
+    if len(line)>0 {
+      i := strings.Index(line, " ")
+      if i>-1 {
+        tag = line[:i]
+      } else {
+        tag = line[:]
+      }
       nodes = closeNodes(nodes, level)
       nodes = append(nodes, &node{level,tag})
-      fmt.Print("<",tag,">")
+      fmt.Print("<",line,">")
     }
 	}
 
