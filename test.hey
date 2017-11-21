@@ -5,6 +5,7 @@ html
       | Hey world !
 
   body
+    <!-- this is a comment -->
     div class='accent'
       | Hello 
       span
@@ -15,5 +16,7 @@ html
       span
         | Commented
     footer
-      | Footer
+      <div>
+        | Footer
+      </div>
 

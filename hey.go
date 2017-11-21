@@ -22,7 +22,7 @@ func closeNodes(nodes nodeSlice, level int) nodeSlice {
   for len(nodes)>0 {
     last := nodes.last()
     if last.level<level { break }
-    if last.tag=="|" || last.tag=="/" {
+    if last.tag=="|" || last.tag=="/" || last.tag[0]=='<' {
       // No closing
     } else {
       fmt.Print("</", last.tag, ">");
@@ -86,6 +86,8 @@ func main() {
         fmt.Print(line[2:])
       } else if tag=="/" {
         // Comment
+      } else if tag[0]=='<' {
+        fmt.Print(line)
       } else {
         fmt.Print("<",line,">")
       }
