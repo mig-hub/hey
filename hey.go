@@ -1,23 +1,30 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"bufio"
 	"os"
 )
 
 type node struct {
   level int
   tag string
-  previous *node
 }
 
-func closeNodes(lastNode *node, level int) *node {
-  for lastNode!=nil && level<=lastNode.level {
-    fmt.Print("</", lastNode.tag, ">");
-    lastNode = lastNode.previous
+type nodeSlice []*node
+
+func (nodes nodeSlice) last() *node {
+  return nodes[len(nodes)-1]
+}
+
+func closeNodes(nodes nodeSlice, level int) nodeSlice {
+  for len(nodes)>0 {
+    last := nodes[len(nodes)-1]
+    if last.level<level { break }
+    fmt.Print("</", last.tag, ">");
+    nodes = nodes[:len(nodes)-1]
   }
-  return lastNode;
+  return nodes
 }
 
 func indentLevel(line string) int {
@@ -34,25 +41,25 @@ func indentLevel(line string) int {
 
 func main() {
 
-	fileScanner := bufio.NewScanner(os.Stdin)
-
   line := ""
   level := 0
   tag := ""
-  var lastNode *node
+  nodes := make(nodeSlice, 0, 16)
+
+	fileScanner := bufio.NewScanner(os.Stdin)
 
 	for fileScanner.Scan() {
     line = fileScanner.Text()
 		level = indentLevel(line)
     tag = line[level:]
     if len(tag)>0 {
-      lastNode = closeNodes(lastNode, level)
-      lastNode = &node{level,tag,lastNode}
+      nodes = closeNodes(nodes, level)
+      nodes = append(nodes, &node{level,tag})
       fmt.Print("<",tag,">")
     }
 	}
 
-  closeNodes(lastNode, 0)
+  closeNodes(nodes, 0)
   fmt.Println("")
 }
 
